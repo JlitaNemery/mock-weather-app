@@ -22,7 +22,7 @@ export default function Select({ title, list, paramName, defaultValue }: SearchP
   };
 
   return (
-    <Box maxWidth="200px">
+    <Box width="200px">
       <Text fontSize="sm" color="gray.600" mb={1} textAlign="left">
         {title}
       </Text>
