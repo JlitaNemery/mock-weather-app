@@ -26,7 +26,7 @@ export default function Search() {
   };
 
   return (
-    <Box maxWidth="200px">
+    <Box width="258px">
       <Text fontSize="sm" color="gray.600" mb={1} textAlign="left">
         Search:
       </Text>
