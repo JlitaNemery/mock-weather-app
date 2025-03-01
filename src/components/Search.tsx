@@ -11,12 +11,15 @@ export default function Search() {
   const value = useDebounce(text, 400);
 
   useEffect(() => {
-    if (value) {
-      searchParams.set(PARAM_SEARCH, value);
-    } else {
-      searchParams.delete(PARAM_SEARCH);
+    const currentParam = searchParams.get(PARAM_SEARCH) || '';
+    if (value !== currentParam) {
+      if (value) {
+        searchParams.set(PARAM_SEARCH, value);
+      } else {
+        searchParams.delete(PARAM_SEARCH);
+      }
+      setSearchParams(searchParams);
     }
-    setSearchParams(searchParams);
   }, [value]);
 
   const clearSearch = () => {

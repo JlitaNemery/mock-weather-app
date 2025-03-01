@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { SimpleGrid } from '@chakra-ui/react';
@@ -10,16 +11,29 @@ export default function Cities() {
   const [searchParams, _] = useSearchParams();
   const queryClient = useQueryClient();
 
-  const cities = queryClient.getQueryData<City[]>(['citiesData']) || [];
+  const [cities, setCities] = useState<City[]>(queryClient.getQueryData<City[]>(['citiesData']) || []);
+
+  useEffect(() => {
+    const unsubscribe = queryClient.getQueryCache().subscribe(() => {
+      const updatedCities = queryClient.getQueryData<City[]>(['citiesData']) || [];
+      setCities(updatedCities);
+    });
+
+    return () => unsubscribe();
+  }, [queryClient]);
 
   const search = searchParams.get(PARAM_SEARCH) || '';
   const continent = searchParams.get(PARAM_CONTINENT) || CONTINENTS_ALL;
   const sort = searchParams.get(PARAM_SORT) || SORT_NAME;
 
   const filteredCities: City[] = cities
-    .filter((city: City) => city.active)
-    .filter((city: City) => city.name.toLowerCase().includes(search.toLowerCase()) || city.country.toLowerCase().includes(search.toLowerCase()))
-    .filter((city: City) => (continent === CONTINENTS_ALL ? true : city.continent === continent))
+    .filter((city: City) => {
+      return (
+        city.active &&
+        (city.name.toLowerCase().includes(search.toLowerCase()) || city.country.toLowerCase().includes(search.toLowerCase())) &&
+        (continent === CONTINENTS_ALL || city.continent === continent)
+      );
+    })
     .sort((a, b) => sortByOption(sort, a, b));
 
   return filteredCities.length > 0 ? (
